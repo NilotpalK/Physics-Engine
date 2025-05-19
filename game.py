@@ -10,9 +10,7 @@ pygame.display.set_caption("Pysics Engine")
 
 LEFT, RIGHT, UP, DOWN = False, False, False, False
 
-ball1 = Ball(100, 100, 20)
-ball1.velocity = 5
-ball2 = Ball(200, 200, 30)
+ball1 = Ball(100, 100, 50)
 ball1.player = True
 
 running = True

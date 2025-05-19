@@ -18,19 +18,9 @@ class Ball(MovingObject):
         pygame.draw.circle(screen, (0,0,0), (self.x, self.y), self.radius, 1)
     
     def display(self, screen):
-        # Draw acceleration vector (green line)
-        pygame.draw.line(
-            screen, 
-            (0, 255, 0),  # Green color
-            (self.x, self.y),  # Start at ball position
-            (self.x + self.acceleration_x * 100, self.y + self.acceleration_y * 100)  # Multiply by 100 to make visible
-        )
-        
-        # Draw velocity vector (blue line)
-        pygame.draw.line(
-            screen, 
-            (0, 0, 255),  # Blue color
-            (self.x, self.y),  # Start at ball position
-            (self.x + self.velocity_x * 10, self.y + self.velocity_y * 10)  # Multiply by 10 to make visible
-        )
-        
+        # Draw acceleration vector (blue line)
+        self.acceleration.unit_vector().drawVector(550, 400, 50, (0, 0, 255), screen)
+        # Draw velocity vector (green line)
+        self.velocity.drawVector(550, 400, 10, (0, 255, 0), screen)
+        # Get a vector direction map
+        pygame.draw.circle(screen, (0,0,0), (550, 400), self.radius, 1)

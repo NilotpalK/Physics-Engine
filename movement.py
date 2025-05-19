@@ -1,4 +1,5 @@
 import math
+import pygame
 
 FRICTION = 0.1
 
@@ -12,40 +13,57 @@ class Vector:
     
     def sub(self, other): # subtract the current vector from the argument vector
         return Vector(self.x - other.x, self.y - other.y)
+    
+    def mul(self, scalar): # multiply the current vector by a scalar
+        return Vector(self.x * scalar, self.y * scalar)
 
     def mag(self): # return the magnitude of the current vector
         return math.sqrt(self.x**2 + self.y**2)
+    
+    def drawVector(self, start_x, start_y, scaler, color: tuple[int, int, int], screen):
+        pygame.draw.line(screen, color, (start_x, start_y), (start_x + self.x * scaler, start_y + self.y * scaler))
+
+    def unit_vector(self):
+        if(self.mag() == 0):
+            return Vector(0, 0)
+        return Vector(self.x / self.mag(), self.y / self.mag())
+    
+    def normal(self):
+        return Vector(-self.y, self.x).unit_vector()
+    
+    @staticmethod
+    def dot(vector_1, vector_2):
+        return vector_1.x * vector_2.x + vector_1.y * vector_2.y
 
 class MovingObject:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.velocity_x = 0
-        self.velocity_y = 0
-        self.acceleration_x = 0
-        self.acceleration_y = 0
-        self.acceleration = 1
+        self.velocity = Vector(0, 0)
+        self.acceleration = Vector(0, 0)
+        self.acceleration_scalar = 2
 
     def move(self, LEFT, RIGHT, UP, DOWN):
         if LEFT:
-            self.acceleration_x = -self.acceleration
-        elif RIGHT:
-            self.acceleration_x = self.acceleration
+            self.acceleration.x = -self.acceleration_scalar
+        if RIGHT:
+            self.acceleration.x = self.acceleration_scalar
         if UP:  
-            self.acceleration_y = -self.acceleration
-        elif DOWN:
-            self.acceleration_y = self.acceleration
+            self.acceleration.y = -self.acceleration_scalar
+        if DOWN:
+            self.acceleration.y = self.acceleration_scalar  
         if not (LEFT or RIGHT or UP or DOWN):
-            self.acceleration_x = 0
-            self.acceleration_y = 0
+            self.acceleration.x = 0
+            self.acceleration.y = 0
         if (LEFT and RIGHT):
-            self.acceleration_x = 0
+            self.acceleration.x = 0
         if (UP and DOWN):
-            self.acceleration_y = 0
+            self.acceleration.y = 0
         
-        self.velocity_x += self.acceleration_x
-        self.velocity_y += self.acceleration_y
-        self.velocity_x *= 1 - FRICTION
-        self.velocity_y *= 1 - FRICTION
-        self.x += self.velocity_x
-        self.y += self.velocity_y
+        #To make the acceleration diagonally uniform
+        self.acceleration = self.acceleration.unit_vector().mul(self.acceleration_scalar)
+        
+        self.velocity = self.velocity.add(self.acceleration)
+        self.velocity = self.velocity.mul(1 - FRICTION)
+        self.x += self.velocity.x
+        self.y += self.velocity.y
