@@ -37,8 +37,7 @@ class Vector:
 
 class MovingObject:
     def __init__(self, x, y):
-        self.x = x
-        self.y = y
+        self.position = Vector(x, y)
         self.velocity = Vector(0, 0)
         self.acceleration = Vector(0, 0)
         self.acceleration_scalar = 2
@@ -65,5 +64,23 @@ class MovingObject:
         
         self.velocity = self.velocity.add(self.acceleration)
         self.velocity = self.velocity.mul(1 - FRICTION)
-        self.x += self.velocity.x
-        self.y += self.velocity.y
+        self.position = self.position.add(self.velocity)
+
+class Force(MovingObject):
+    def __init__(self, ball_1, ball_2):
+        self.ball_1 = ball_1
+        self.ball_2 = ball_2
+
+    def collision_detection(self):
+        if (self.ball_1.radius + self.ball_2.radius >= self.ball_2.position.sub(self.ball_1.position).mag()):
+            return True
+        return False
+
+    def collision_response(self):
+        #points from the center of the ball 2 to the center of the ball 1
+        dist_between_centers = self.ball_1.position.sub(self.ball_2.position)
+        penetration_depth = self.ball_1.radius + self.ball_2.radius - dist_between_centers.mag()
+        penetration_resolution = dist_between_centers.unit_vector().mul(penetration_depth/2)
+        self.ball_1.position = self.ball_1.position.add(penetration_resolution)
+        self.ball_2.position = self.ball_2.position.add(penetration_resolution.mul(-1))
+

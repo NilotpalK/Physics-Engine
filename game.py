@@ -1,6 +1,6 @@
 import pygame  
 import sys    
-from movement import MovingObject
+from movement import Vector, Force
 from objects import Ball, BALLZ
 
 pygame.init() 
@@ -12,6 +12,7 @@ LEFT, RIGHT, UP, DOWN = False, False, False, False
 
 ball1 = Ball(100, 100, 50)
 ball1.player = True
+ball2 = Ball(250, 250, 30)
 
 running = True
 
@@ -44,9 +45,18 @@ while running:
 
     for ball in BALLZ:
         if ball.player:
-            ball.move(LEFT, RIGHT, UP, DOWN)    
+            ball.move(LEFT, RIGHT, UP, DOWN)   
+            ball.display(screen) 
         ball.drawBall(screen)
-        ball.display(screen)
+        
+        distance_vector = ball.position.sub(ball1.position)
+
+        force = Force(ball1, ball2)
+        if force.collision_detection():
+            force.collision_response()
+            font = pygame.font.SysFont('Arial', 19)
+            text = font.render("Collision Detected", True, (0, 0, 0))
+            screen.blit(text, (470, 330))
 
     pygame.display.flip()
 
